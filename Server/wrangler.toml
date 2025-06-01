@@ -1,0 +1,3 @@
+name = "bicycle-nav-sg-server"
+main = "cloudflare-workers.js"
+compatibility_date = "2025-05-25"
