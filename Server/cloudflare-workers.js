@@ -51,7 +51,7 @@ export default {
     }
     // If we are still unable to get an auth token, just give up
     if (auth === null) {
-      return Response(null, { status: 401 });
+      return new Response(null, { status: 401 });
     }
     const authJson = await auth.json();
     const authToken = authJson.access_token;
