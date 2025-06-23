@@ -39,16 +39,28 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Iterable<Widget> clearSearch(SearchController controller) {
+    if (!controller.isOpen) {
+      return [const SizedBox.shrink()];
+    }
+    return [
+      Tooltip(
+        message: "Clear Search",
+        child: IconButton(
+          onPressed: () => controller.clear(),
+          icon: Icon(Icons.clear),
+        ),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // What we want here is for the text field to slide over the background minimap whenever we click it
-      // I.e. searchbar and keyboard covering bottom part of screen, and a useable minimap in the background before typing starts
-      // When there has been input, cover the minimap with recommendations instead
-      // Text field is to show a back button on the left and a clear button on the right once clicked.
-
+      // What we want here is for the text field to slide over the background minimap whenever we click it, and for the minimap to fade out
+      // Text field is to show a button to clear on the right once clicked. On the left is a search button that will change into a back button
       // Aside: Is custom android back management required? Testing will need to be done on android back button vs app back button
-      body: Container(
+      body: SizedBox(
         height: double.maxFinite,
         child: Stack(
           children: [
@@ -57,9 +69,30 @@ class _HomePageState extends State<HomePage> {
                 alignment: FractionalOffset.bottomCenter,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: TextField(
-                    controller: myController,
-                    //TODO onChanged: Onemap.updateLocationSearch(),
+                  child: SearchAnchor(
+                    builder: (_, SearchController controller) {
+                      return SearchBar(
+                        controller: controller,
+                        onTap: () => controller.openView(),
+                        onChanged: (_) => controller.openView(),
+                        leading: const Icon(Icons.search),
+                        trailing: clearSearch(controller),
+                      );
+                    },
+                    suggestionsBuilder: (_, SearchController controller) {
+                      //TODO onChanged: Onemap.updateLocationSearch(),
+                      return List<ListTile>.generate(5, (int index) {
+                        final String item = 'item $index';
+                        return ListTile(
+                          title: Text(item),
+                          onTap: () {
+                            setState(() {
+                              controller.closeView(item);
+                            });
+                          },
+                        );
+                      });
+                    },
                   ),
                 ),
               ),
